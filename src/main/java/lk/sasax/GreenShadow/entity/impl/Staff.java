@@ -1,6 +1,7 @@
-package lk.sasax.GreenShadow.entity;
+package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
+import lk.sasax.GreenShadow.entity.SuperEntity;
 import lk.sasax.GreenShadow.util.Enum.Gender;
 import lk.sasax.GreenShadow.util.Enum.StaffRole;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "staff")
-public class Staff {
+public class Staff implements SuperEntity {
     @Id
     @Column(name = "staff_member_id", unique = true)
     private String id;

@@ -1,6 +1,7 @@
-package lk.sasax.GreenShadow.entity;
+package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
+import lk.sasax.GreenShadow.entity.SuperEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Table(name = "crops")
-public class Crop {
+public class Crop implements SuperEntity {
     @Id
     @Column(name = "crop_code", unique = true)
     private String cropCode;
