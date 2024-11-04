@@ -5,8 +5,9 @@ import lk.sasax.GreenShadow.customObj.VehicleResponse;
 import lk.sasax.GreenShadow.customObj.impl.VehicleErrorResponse;
 import lk.sasax.GreenShadow.dto.impl.VehicleDTO;
 import lk.sasax.GreenShadow.entity.impl.Vehicle;
+import lk.sasax.GreenShadow.exception.DataPersistFailedException;
 import lk.sasax.GreenShadow.exception.VehicleNotFoundException;
-import lk.sasax.GreenShadow.repo.VehicleRepo;
+import lk.sasax.GreenShadow.repository.VehicleRepository;
 import lk.sasax.GreenShadow.service.VehicleService;
 import lk.sasax.GreenShadow.util.AppUtil;
 import org.modelmapper.ModelMapper;
@@ -17,11 +18,11 @@ import java.util.Optional;
 
 @Service
 public class VehicleServiceImpl implements VehicleService {
-    private final VehicleRepo vehicleRepo;
-    private ModelMapper modelMapper;
+    private final VehicleRepository vehicleRepository;
+    private final ModelMapper modelMapper;
 
-    public VehicleServiceImpl(VehicleRepo vehicleRepo, ModelMapper modelMapper) {
-        this.vehicleRepo = vehicleRepo;
+    public VehicleServiceImpl(VehicleRepository vehicleRepository, ModelMapper modelMapper) {
+        this.vehicleRepository = vehicleRepository;
         this.modelMapper = modelMapper;
     }
 
@@ -29,16 +30,16 @@ public class VehicleServiceImpl implements VehicleService {
     public void saveVehicle(VehicleDTO vehicleDTO) {
         vehicleDTO.setVehicleCode(AppUtil.createVehicleId());
         Vehicle savedVehicle =
-                vehicleRepo.save(modelMapper.map(vehicleDTO, Vehicle.class));
+                vehicleRepository.save(modelMapper.map(vehicleDTO, Vehicle.class));
         if (savedVehicle == null) {
-            throw new VehicleNotFoundException("Vehicle not saved");
+            throw new DataPersistFailedException("Vehicle not saved");
         }
     }
 
     @Override
     @Transactional
     public void updateVehicle(String id,VehicleDTO vehicleDTO) {
-        Vehicle vehicle = vehicleRepo.findById(id)
+        Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found"));
         vehicle.setLicensePlateNumber(vehicleDTO.getLicensePlateNumber());
         vehicle.setVehicleCategory(vehicleDTO.getVehicleCategory());
@@ -50,15 +51,15 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public void deleteVehicle(String id) {
-        Optional<Vehicle> selectedVehicle = vehicleRepo.findById(id);
+        Optional<Vehicle> selectedVehicle = vehicleRepository.findById(id);
         if (!selectedVehicle.isPresent()) {
             throw new VehicleNotFoundException("Vehicle not found");
-        }else vehicleRepo.deleteById(id);
+        }else vehicleRepository.deleteById(id);
     }
 
     @Override
     public VehicleResponse getSelectedVehicle(String id) {
-        Optional<Vehicle> byId = vehicleRepo.findById(id);
+        Optional<Vehicle> byId = vehicleRepository.findById(id);
         return(byId.isPresent())
                 ?modelMapper.map(byId.get(), VehicleDTO.class)
                 :new VehicleErrorResponse(0,"Vehicle not found");
@@ -66,6 +67,6 @@ public class VehicleServiceImpl implements VehicleService {
 
     @Override
     public List<VehicleDTO> getAllVehicles() {
-        return modelMapper.map(vehicleRepo.findAll(), List.class);
+        return modelMapper.map(vehicleRepository.findAll(), List.class);
     }
 }
