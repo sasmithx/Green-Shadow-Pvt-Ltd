@@ -2,6 +2,7 @@ package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
 import lk.sasax.GreenShadow.entity.SuperEntity;
+import lk.sasax.GreenShadow.util.Enum.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,25 +10,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Table(name = "vehicle")
 @Entity
-@Table(name = "vehicles")
 public class Vehicle implements SuperEntity {
     @Id
-    @Column(name = "vehicle_code", unique = true)
     private String vehicleCode;
-    @Column(name = "licence_plate_number")
-    private String licensePlateNumber;
-    @Column(name = "vehicle_category")
-    private String vehicleCategory;
-    @Column(name = "fuel_type")
+    //@Column(nullable = false)
+    private String licensePlateNo;
+    //@Column(nullable = false)
+    private String category;
+    //@Column(nullable = false)
     private String fuelType;
-    @Column(name = "status")
-    private String status;
-
+    //@Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    //@Column(nullable = false)
+    private String remark;
     @ManyToOne
-    @JoinColumn(name = "staff_member_id")
-    //@Column(name = "allocated_staff_members")
-    private Staff allocatedStaffMemberDetails;
-    @Column(name = "remarks")
-    private String remarks;
+    @JoinColumn(name = "assigned_staff_id")
+    private Staff staff;
 }

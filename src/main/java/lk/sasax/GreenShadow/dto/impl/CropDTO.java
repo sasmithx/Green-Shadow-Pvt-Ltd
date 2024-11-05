@@ -2,11 +2,9 @@ package lk.sasax.GreenShadow.dto.impl;
 
 import lk.sasax.GreenShadow.customObj.CropResponse;
 import lk.sasax.GreenShadow.dto.SuperDTO;
-import lk.sasax.GreenShadow.entity.impl.Field;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 
 @AllArgsConstructor
 @NoArgsConstructor

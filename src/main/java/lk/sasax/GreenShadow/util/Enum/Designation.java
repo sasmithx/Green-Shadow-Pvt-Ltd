@@ -3,7 +3,7 @@ package lk.sasax.GreenShadow.util.Enum;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public enum StaffRole {
+public enum Designation {
     MANAGER,
     SENIOR_ASSISTANT_MANAGER,
     ASSISTANT_MANAGER,

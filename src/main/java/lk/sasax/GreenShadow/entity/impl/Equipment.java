@@ -2,6 +2,8 @@ package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
 import lk.sasax.GreenShadow.entity.SuperEntity;
+import lk.sasax.GreenShadow.util.Enum.EquipmentType;
+import lk.sasax.GreenShadow.util.Enum.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,27 +11,23 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Table(name = "equipment")
 @Entity
-@Table(name = "equipments")
 public class Equipment implements SuperEntity {
     @Id
-    @Column(name = "eqiupment_id", unique = true)
     private String equipmentId;
-    @Column(name = "equipment_name")
+    //@Column(nullable = false)
     private String name;
-    @Column(name = "equipment_type")
-    private String type;
-    @Column(name = "availability_status")
-    private String status;
-
+    //@Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EquipmentType type;
+    //@Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "assigned_staff_id", referencedColumnName = "id")
+    private Staff staff;
     @ManyToOne
-    @JoinColumn(name = "staff_member_id")
-//    @Column(name = "assigned_staff_details")
-    private Staff assignedStaffDetails;
-
-    @ManyToOne
-    @JoinColumn(name = "field_code")
-//    @Column(name = "assigned_field_details")
-    private Field assignedFieldDetails;
-
+    @JoinColumn(name = "assigned_field_id")
+    private Field field;
 }

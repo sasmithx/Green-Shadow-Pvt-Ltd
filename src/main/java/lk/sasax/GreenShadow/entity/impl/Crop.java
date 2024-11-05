@@ -2,33 +2,37 @@ package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
 import lk.sasax.GreenShadow.entity.SuperEntity;
+import lk.sasax.GreenShadow.util.Enum.AvailabilityStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Table(name = "crop")
 @Entity
-@Table(name = "crops")
 public class Crop implements SuperEntity {
     @Id
-    @Column(name = "crop_code", unique = true)
     private String cropCode;
-    @Column(name = "crop_common_name")
-    private String cropCommonName;
-    @Column(name = "crop_scientific_name")
-    private String cropScientificName;
-    @Column(name = "crop_image", columnDefinition = "LONGTEXT")
-    private String cropImage;
-    @Column(name = "category")
+    //@Column(nullable = false)
+    private String commonName;
+    //@Column(nullable = false, unique = true)
+    private String scientificName;
+    //@Column(nullable = false)
     private String category;
-    private String cropSeason;
+    //@Column(nullable = false)
+    private String season;
+    //@Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AvailabilityStatus status;
+    //@Column(nullable = false, columnDefinition = "LONGTEXT")
+    private String cropImage;
     @ManyToOne
-    @JoinColumn(name = "field_code")
+    @JoinColumn(name = "field_id")
     private Field field;
-
-    @ManyToOne
-    @JoinColumn(name = "log_code")
-    private CropDetails cropDetails;
+    @ManyToMany(mappedBy = "crops")
+    private List<MonitoringLog> monitoringLogs;
 }

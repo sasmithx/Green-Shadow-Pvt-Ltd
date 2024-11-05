@@ -10,6 +10,8 @@ import lk.sasax.GreenShadow.exception.VehicleNotFoundException;
 import lk.sasax.GreenShadow.repository.VehicleRepository;
 import lk.sasax.GreenShadow.service.VehicleService;
 import lk.sasax.GreenShadow.util.AppUtil;
+import lk.sasax.GreenShadow.util.Enum.Status;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -17,14 +19,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
     private final ModelMapper modelMapper;
 
-    public VehicleServiceImpl(VehicleRepository vehicleRepository, ModelMapper modelMapper) {
+    /*public VehicleServiceImpl(VehicleRepository vehicleRepository, ModelMapper modelMapper) {
         this.vehicleRepository = vehicleRepository;
         this.modelMapper = modelMapper;
-    }
+    }*/
 
     @Override
     public void saveVehicle(VehicleDTO vehicleDTO) {
@@ -41,12 +44,12 @@ public class VehicleServiceImpl implements VehicleService {
     public void updateVehicle(String id,VehicleDTO vehicleDTO) {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found"));
-        vehicle.setLicensePlateNumber(vehicleDTO.getLicensePlateNumber());
-        vehicle.setVehicleCategory(vehicleDTO.getVehicleCategory());
+        vehicle.setLicensePlateNo(vehicleDTO.getLicensePlateNo());
+        vehicle.setCategory(vehicleDTO.getCategory());
         vehicle.setFuelType(vehicleDTO.getFuelType());
-        vehicle.setStatus(vehicleDTO.getStatus());
-        vehicle.setAllocatedStaffMemberDetails(vehicleDTO.getAllocatedStaffMemberDetails());
-        vehicle.setRemarks(vehicleDTO.getRemarks());
+        vehicle.setStatus(Status.valueOf(vehicleDTO.getStatus()));
+        vehicle.setStaff(vehicleDTO.getStaff());
+        vehicle.setRemark(vehicleDTO.getRemark());
     }
 
     @Override

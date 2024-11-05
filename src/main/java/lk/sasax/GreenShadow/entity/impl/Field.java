@@ -2,6 +2,7 @@ package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
 import lk.sasax.GreenShadow.entity.SuperEntity;
+import lk.sasax.GreenShadow.util.Enum.AvailabilityStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,32 +13,35 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Table(name = "field")
 @Entity
-@Table(name = "fields")
 public class Field implements SuperEntity {
     @Id
-    @Column(name = "field_code", unique = true)
-    private String fieldCode;
-    @Column(name = "field_name")
+    private String fCode;
+    //@Column(length = 100, nullable = false, unique = true)
     private String fieldName;
-    @Column(name = "field_location")
+    //@Column(nullable = false)
+    private Double fieldSize;
+    //@Column(nullable = false)
     private Point fieldLocation;
-    @Column(name = "extent_size")
-    private Double extentSize;
-    @OneToMany(mappedBy = "field", cascade = CascadeType.ALL)
-    private List<Crop> crops;
-    @ManyToMany
-    @Column(name = "staff")
-    private List<Staff> staff;
-    @Column(name = "image_1", columnDefinition = "LONGTEXT")
+    //@Column(nullable = false, columnDefinition = "LONGTEXT")
     private String fieldImage1;
-    @Column(name = "image_2", columnDefinition = "LONGTEXT")
+    //@Column(nullable = false, columnDefinition = "LONGTEXT")
     private String fieldImage2;
-
-    @OneToMany(mappedBy = "assignedFieldDetails")
-    private List<Equipment> equipment;
-
-    @ManyToOne
-    @JoinColumn(name = "log_code")
-    private CropDetails cropDetails;
+    //@Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private AvailabilityStatus status;
+    @OneToMany(mappedBy = "field")
+    private List<Crop> crops;
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "field_staff",
+            joinColumns = @JoinColumn(name = "field_id"),
+            inverseJoinColumns = @JoinColumn(name = "staff_id")
+    )
+    private List<Staff> staffs;
+    @OneToMany(mappedBy = "field")
+    private List<Equipment> equipments;
+    @ManyToMany(mappedBy = "fields")
+    private List<MonitoringLog> monitoringLogs;
 }
