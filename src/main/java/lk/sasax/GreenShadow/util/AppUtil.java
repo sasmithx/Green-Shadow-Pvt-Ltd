@@ -11,6 +11,7 @@ public class AppUtil {
     private static int vehicleCounter = 1;
     private static int equipmentCounter = 1;
     private static int cropCounter = 1;
+    private static int staffCounter= 1;
 
     public static String createUserId() {
         String id = String.format("U%03d", userCounter); // Generates "U001", "U002", etc.
@@ -21,6 +22,12 @@ public class AppUtil {
     public static String createVehicleId() {
         String id = String.format("V%03d", vehicleCounter); // Generates "V001", "V002", etc.
         vehicleCounter++;
+        return id;
+    }
+
+    public static String createStaffId() {
+        String id = String.format("ST%03d", staffCounter); // Generates "ST001", "ST002", etc.
+        staffCounter++;
         return id;
     }
 

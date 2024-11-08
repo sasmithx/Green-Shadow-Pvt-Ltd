@@ -2,6 +2,7 @@ package lk.sasax.GreenShadow.entity.impl;
 
 import jakarta.persistence.*;
 import lk.sasax.GreenShadow.entity.SuperEntity;
+import lk.sasax.GreenShadow.util.Enum.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,5 +18,5 @@ public class User implements SuperEntity {
     //@Column(nullable = false)
     private String password;
     //@Column(nullable = false)
-    private String role;
+    private Role role;
 }
