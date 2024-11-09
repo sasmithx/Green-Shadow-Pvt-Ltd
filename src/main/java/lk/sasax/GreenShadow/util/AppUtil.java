@@ -43,6 +43,12 @@ public class AppUtil {
         return id;
     }
 
+    public static String createFieldId() {
+        String id = String.format("F%03d", cropCounter); // Generates "F001", "F002", etc.
+        cropCounter++;
+        return id;
+    }
+
     //Convert to Base64
     public static String toBase64(MultipartFile file) {
         try {
