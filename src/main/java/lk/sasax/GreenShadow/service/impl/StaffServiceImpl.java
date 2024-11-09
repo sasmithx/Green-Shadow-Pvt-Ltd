@@ -4,10 +4,14 @@ import jakarta.transaction.Transactional;
 import lk.sasax.GreenShadow.customObj.StaffResponse;
 import lk.sasax.GreenShadow.customObj.impl.StaffErrorResponse;
 import lk.sasax.GreenShadow.dto.impl.StaffDTO;
+import lk.sasax.GreenShadow.entity.impl.Field;
 import lk.sasax.GreenShadow.entity.impl.Staff;
+import lk.sasax.GreenShadow.entity.impl.Vehicle;
 import lk.sasax.GreenShadow.exception.DataPersistFailedException;
 import lk.sasax.GreenShadow.exception.StaffNotFoundException;
+import lk.sasax.GreenShadow.repository.FieldRepository;
 import lk.sasax.GreenShadow.repository.StaffRepository;
+import lk.sasax.GreenShadow.repository.VehicleRepository;
 import lk.sasax.GreenShadow.service.StaffService;
 import lk.sasax.GreenShadow.util.AppUtil;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class StaffServiceImpl implements StaffService {
     private final StaffRepository staffRepository;
+    private final FieldRepository fieldRepository;
+    private final VehicleRepository vehicleRepository;
     private final ModelMapper modelMapper;
 
 
@@ -54,10 +60,20 @@ public class StaffServiceImpl implements StaffService {
         staff.setFields(staffDTO.getFields());
         staff.setVehicles(staffDTO.getVehicles());
 
-       /* if(!staffRepository.existsById(staffDTO.getId())) {
-            throw new StaffNotFoundException("Staff not found");
-        }else {
-            staffRepository.save(modelMapper.map(staffDTO, Staff.class));
+        /*Optional<Field> fieldOptional = fieldRepository.findById(staff.getFields().toString());
+        if (fieldOptional.isPresent()) {
+            Field field = fieldOptional.get();
+            staff.setFields((List<Field>) field);
+        } else {
+            throw new StaffNotFoundException("Field not found for ID: " + staff.getFields());
+        }
+
+        Optional<Vehicle> vehicleOptional = vehicleRepository.findById(staff.getVehicles().toString());
+        if (vehicleOptional.isPresent()) {
+            Vehicle vehicle = vehicleOptional.get();
+            staff.setVehicles((List<Vehicle>) vehicle);
+        } else {
+            throw new StaffNotFoundException("Vehicle not found for ID: " + staff.getVehicles());
         }*/
     }
 
@@ -65,7 +81,7 @@ public class StaffServiceImpl implements StaffService {
     public void deleteStaff(String id) {
         Optional<Staff> selectedStaff = staffRepository.findById(id);
         if(!selectedStaff.isPresent()) {
-            throw new StaffNotFoundException("Staff Not found");
+            throw new StaffNotFoundException("Staff Not found ");
         }else staffRepository.deleteById(id);
     }
 

@@ -4,9 +4,11 @@ import jakarta.transaction.Transactional;
 import lk.sasax.GreenShadow.customObj.VehicleResponse;
 import lk.sasax.GreenShadow.customObj.impl.VehicleErrorResponse;
 import lk.sasax.GreenShadow.dto.impl.VehicleDTO;
+import lk.sasax.GreenShadow.entity.impl.Staff;
 import lk.sasax.GreenShadow.entity.impl.Vehicle;
 import lk.sasax.GreenShadow.exception.DataPersistFailedException;
 import lk.sasax.GreenShadow.exception.VehicleNotFoundException;
+import lk.sasax.GreenShadow.repository.StaffRepository;
 import lk.sasax.GreenShadow.repository.VehicleRepository;
 import lk.sasax.GreenShadow.service.VehicleService;
 import lk.sasax.GreenShadow.util.AppUtil;
@@ -22,12 +24,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VehicleServiceImpl implements VehicleService {
     private final VehicleRepository vehicleRepository;
+    private final StaffRepository staffRepository;
     private final ModelMapper modelMapper;
-
-    /*public VehicleServiceImpl(VehicleRepository vehicleRepository, ModelMapper modelMapper) {
-        this.vehicleRepository = vehicleRepository;
-        this.modelMapper = modelMapper;
-    }*/
 
     @Override
     public void saveVehicle(VehicleDTO vehicleDTO) {
@@ -48,7 +46,9 @@ public class VehicleServiceImpl implements VehicleService {
         vehicle.setCategory(vehicleDTO.getCategory());
         vehicle.setFuelType(vehicleDTO.getFuelType());
         vehicle.setStatus(Status.valueOf(vehicleDTO.getStatus()));
-        vehicle.setStaff(vehicleDTO.getStaff());
+        Optional<Staff> staffOptional = staffRepository.findById(vehicleDTO.getStaff());
+        Staff staff = staffOptional.get();
+        vehicle.setStaff(staff);
         vehicle.setRemark(vehicleDTO.getRemark());
     }
 

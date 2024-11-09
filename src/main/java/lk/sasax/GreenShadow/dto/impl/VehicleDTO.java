@@ -16,6 +16,6 @@ public class VehicleDTO implements SuperDTO, VehicleResponse {
     private String category;
     private String fuelType;
     private String status;
-    private Staff staff;
+    private String staff;
     private String remark;
 }

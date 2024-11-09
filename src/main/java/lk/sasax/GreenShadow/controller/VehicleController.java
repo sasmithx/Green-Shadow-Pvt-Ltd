@@ -5,6 +5,7 @@ import lk.sasax.GreenShadow.dto.impl.VehicleDTO;
 import lk.sasax.GreenShadow.exception.DataPersistFailedException;
 import lk.sasax.GreenShadow.exception.VehicleNotFoundException;
 import lk.sasax.GreenShadow.service.VehicleService;
+import lk.sasax.GreenShadow.util.AppUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -32,6 +33,7 @@ public class VehicleController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public VehicleResponse getSelectedVehicle(@PathVariable("id") String id) {
@@ -63,10 +65,13 @@ public class VehicleController {
             vehicleService.updateVehicle(id, vehicleDTO);
             return ResponseEntity.status(HttpStatus.OK).build();
         }catch (VehicleNotFoundException e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (DataPersistFailedException e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (Exception e){
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

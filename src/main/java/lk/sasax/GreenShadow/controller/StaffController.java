@@ -63,11 +63,15 @@ public class StaffController {
             staffService.updateStaff(id, staffDTO);
             return ResponseEntity.status(HttpStatus.OK).build();
         }catch (StaffNotFoundException e){
+            System.out.println(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (DataPersistFailedException e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (Exception e){
+            System.out.println(e.getMessage());
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
