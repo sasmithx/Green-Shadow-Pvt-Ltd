@@ -38,6 +38,8 @@ public class EquipmentController {
         }
     }
 
+    //200
+    //OK But not Updated
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Void> updateEquipment(@PathVariable("id") String id, @RequestBody EquipmentDTO equipmentDTO) {
         try{

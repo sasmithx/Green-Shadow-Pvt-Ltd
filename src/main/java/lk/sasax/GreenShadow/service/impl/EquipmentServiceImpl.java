@@ -1,5 +1,6 @@
 package lk.sasax.GreenShadow.service.impl;
 
+import jakarta.transaction.Transactional;
 import lk.sasax.GreenShadow.customObj.EquipmentResponse;
 import lk.sasax.GreenShadow.customObj.impl.EquipmentErrorResponse;
 import lk.sasax.GreenShadow.dto.impl.EquipmentDTO;
@@ -40,6 +41,7 @@ public class EquipmentServiceImpl implements EquipmentService {
     }
 
     @Override
+    @Transactional
     public void updateEquipment(String id, EquipmentDTO equipmentDTO) {
         Equipment equipment = equipmentRepository.findById(id)
                 .orElseThrow(() -> new EquipmentNotFoundException("Equipment not found"));

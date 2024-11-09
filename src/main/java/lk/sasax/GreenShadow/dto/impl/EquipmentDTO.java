@@ -2,8 +2,6 @@ package lk.sasax.GreenShadow.dto.impl;
 
 import lk.sasax.GreenShadow.customObj.EquipmentResponse;
 import lk.sasax.GreenShadow.dto.SuperDTO;
-import lk.sasax.GreenShadow.entity.impl.Field;
-import lk.sasax.GreenShadow.entity.impl.Staff;
 import lk.sasax.GreenShadow.util.Enum.EquipmentType;
 import lk.sasax.GreenShadow.util.Enum.Status;
 import lombok.AllArgsConstructor;
