@@ -2,6 +2,7 @@ package lk.sasax.GreenShadow.util;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.*;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -57,6 +58,17 @@ public class AppUtil {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public static Point convertToPoint(String fieldLocation) {
+        try {
+            String[] parts = fieldLocation.split(",");
+            int x = Integer.parseInt(parts[0].trim());
+            int y = Integer.parseInt(parts[1].trim());
+            return new Point(x, y);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid fieldLocation format. Expected format: 'x,y'");
         }
     }
 
