@@ -18,11 +18,11 @@ public class MonitoringLog implements SuperEntity {
     @Id
     private String logCode;
     //@Column(nullable = false)
-    @Temporal(TemporalType.DATE)
+//    @Temporal(TemporalType.DATE)
     private Date logDate;
     //@Column(nullable = false)
     private String observation;
-    //@Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String observedImage;
     @ManyToMany
     @JoinTable(

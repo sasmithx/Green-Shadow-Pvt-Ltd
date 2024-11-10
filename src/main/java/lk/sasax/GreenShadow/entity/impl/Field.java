@@ -18,15 +18,15 @@ import java.util.List;
 public class Field implements SuperEntity {
     @Id
     private String fCode;
-    //@Column(length = 100, nullable = false, unique = true)
+    @Column(length = 100, nullable = false, unique = true)
     private String fieldName;
     //@Column(nullable = false)
     private Double fieldSize;
     //@Column(nullable = false)
     private Point fieldLocation;
-    //@Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String fieldImage1;
-    //@Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String fieldImage2;
     //@Column(nullable = false)
     @Enumerated(EnumType.STRING)

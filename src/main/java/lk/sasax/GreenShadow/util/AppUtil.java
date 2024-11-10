@@ -13,6 +13,7 @@ public class AppUtil {
     private static int equipmentCounter = 1;
     private static int cropCounter = 1;
     private static int staffCounter= 1;
+    private static int MonitoringLogCounter= 1;
 
     public static String createUserId() {
         String id = String.format("U%03d", userCounter); // Generates "U001", "U002", etc.
@@ -50,7 +51,13 @@ public class AppUtil {
         return id;
     }
 
-    //Convert to Base64
+    public static String createMonitoringLogId() {
+        String id = String.format("ML%03d", MonitoringLogCounter); // Generates "ML001", "ML002", etc.
+        MonitoringLogCounter++;
+        return id;
+    }
+
+
     public static String toBase64(MultipartFile file) {
         try {
             byte[] fileByteCollection = file.getBytes();
