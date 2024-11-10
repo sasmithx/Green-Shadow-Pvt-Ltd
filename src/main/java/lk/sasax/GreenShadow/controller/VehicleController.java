@@ -5,7 +5,6 @@ import lk.sasax.GreenShadow.dto.impl.VehicleDTO;
 import lk.sasax.GreenShadow.exception.DataPersistFailedException;
 import lk.sasax.GreenShadow.exception.VehicleNotFoundException;
 import lk.sasax.GreenShadow.service.VehicleService;
-import lk.sasax.GreenShadow.util.AppUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

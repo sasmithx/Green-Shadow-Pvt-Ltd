@@ -1,6 +1,6 @@
 package lk.sasax.GreenShadow.util.Enum;
 
-public enum Role {
+public enum AccessRole {
     MANAGER,
     ADMINISTRATIVE,
     SCIENTIST,

@@ -27,6 +27,9 @@ import java.util.List;
 public class MonitoringLogController {
     private final MonitoringLogService monitoringLogService;
 
+    //415
+    //Unsupported Media Type
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveMLog(
             @RequestPart("logDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date logDate,

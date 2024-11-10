@@ -1,22 +1,17 @@
-package lk.sasax.GreenShadow.entity.impl;
+package lk.sasax.GreenShadow.auth.request;
 
-import jakarta.persistence.*;
-import lk.sasax.GreenShadow.entity.SuperEntity;
 import lk.sasax.GreenShadow.util.Enum.AccessRole;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Table(name = "user")
-@Entity
-public class User implements SuperEntity {
-    @Id
+@Builder
+public class SignUpRequest {
     private String email;
-    //@Column(nullable = false)
     private String password;
-    //@Column(nullable = false)
     private AccessRole role;
 }
