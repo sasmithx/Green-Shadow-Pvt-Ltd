@@ -27,8 +27,6 @@ import java.util.List;
 public class MonitoringLogController {
     private final MonitoringLogService monitoringLogService;
 
-    //415
-    //Unsupported Media Type
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveMLog(
@@ -59,9 +57,9 @@ public class MonitoringLogController {
             @RequestPart("logDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date logDate,
             @RequestPart("observation") String observation,
             @RequestPart(value = "observedImage", required = false) MultipartFile observedImage,
-            @RequestPart(value = "fields",required = false) List<Field> fields,
-            @RequestPart(value = "crops",required = false) List<Crop> crops,
-            @RequestPart(value = "staffs",required = false) List<Staff> staffs
+            @RequestParam(value = "fields",required = false) List<Field> fields,
+            @RequestParam(value = "crops",required = false) List<Crop> crops,
+            @RequestParam(value = "staffs",required = false) List<Staff> staffs
     )
     {
         try{

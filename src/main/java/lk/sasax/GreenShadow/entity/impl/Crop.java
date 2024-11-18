@@ -28,7 +28,7 @@ public class Crop implements SuperEntity {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private AvailabilityStatus status;
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = true, columnDefinition = "LONGTEXT")
     private String cropImage;
     @ManyToOne
     @JoinColumn(name = "field_id")

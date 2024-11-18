@@ -24,9 +24,9 @@ public class Field implements SuperEntity {
     private Double fieldSize;
     //@Column(nullable = false)
     private Point fieldLocation;
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = true, columnDefinition = "LONGTEXT")
     private String fieldImage1;
-    @Column(nullable = false, columnDefinition = "LONGTEXT")
+    @Column(nullable = true, columnDefinition = "LONGTEXT")
     private String fieldImage2;
     //@Column(nullable = false)
     @Enumerated(EnumType.STRING)
