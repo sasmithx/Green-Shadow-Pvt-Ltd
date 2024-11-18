@@ -1,9 +1,10 @@
 package lk.sasax.GreenShadow.service;
 
 import lk.sasax.GreenShadow.dto.impl.UserDTO;
-import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-@Service
 public interface UserService {
+
+    UserDetailsService userDetailsService();
     void save(UserDTO userDTO);
 }

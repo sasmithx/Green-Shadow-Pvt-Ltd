@@ -31,9 +31,6 @@ public class FieldController {
     @Autowired
     private final FieldService fieldService;
 
-    //415
-    //Unsupported Media Type
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveField(
             //@RequestPart("fCode") String fCode,
@@ -42,12 +39,13 @@ public class FieldController {
             @RequestPart(value = "fieldLocation",required = false) String fieldLocation,
             @RequestPart(value = "fieldImage1",required = false) MultipartFile fieldImage1,
             @RequestPart(value = "fieldImage2",required = false) MultipartFile fieldImage2,
-            @RequestPart("status")AvailabilityStatus status,
-            @RequestPart(value = "crops",required = false) List<Crop> crops,
+           @RequestParam("status") AvailabilityStatus status
+           /* @RequestPart(value = "crops",required = false) List<Crop> crops,
             @RequestPart(value = "staffs",required = false) List<Staff> staffs,
             @RequestPart(value = "equipments",required = false) List<Equipment> equipments,
-            @RequestPart(value = "monitoringLogs",required = false) List<MonitoringLog> monitoringLogs
+            @RequestPart(value = "monitoringLogs",required = false) List<MonitoringLog> monitoringLogs*/
     ){
+        System.out.println("Save Field");
         try{
             String fieldPic = fieldImage1 !=null ? AppUtil.toBase64(fieldImage1) : null;
             String fieldPic1 = fieldImage2 != null ? AppUtil.toBase64(fieldImage2) : null;
@@ -61,10 +59,10 @@ public class FieldController {
             buildFieldDTO.setFieldImage1(fieldPic);
             buildFieldDTO.setFieldImage2(fieldPic1);
             buildFieldDTO.setStatus(status);
-            buildFieldDTO.setCrops(crops);
+            /*buildFieldDTO.setCrops(crops);
             buildFieldDTO.setStaffs(staffs);
             buildFieldDTO.setEquipments(equipments);
-            buildFieldDTO.setMonitoringLogs(monitoringLogs);
+            buildFieldDTO.setMonitoringLogs(monitoringLogs);*/
             fieldService.saveField(buildFieldDTO);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }catch (DataPersistFailedException e){
