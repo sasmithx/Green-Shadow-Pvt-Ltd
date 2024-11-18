@@ -10,6 +10,8 @@ import lk.sasax.GreenShadow.exception.LogNotFoundException;
 import lk.sasax.GreenShadow.service.MonitoringLogService;
 import lk.sasax.GreenShadow.util.AppUtil;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +29,8 @@ import java.util.List;
 public class MonitoringLogController {
     private final MonitoringLogService monitoringLogService;
 
+    private static final Logger logger = LoggerFactory.getLogger(MonitoringLogController.class);
+
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveMLog(
@@ -41,12 +45,15 @@ public class MonitoringLogController {
         try{
             String observedPic = observedImage != null ? AppUtil.toBase64(observedImage) : null;
             monitoringLogService.saveMLog(new MonitoringLogDTO(null,logDate,observation,observedPic,fields,crops,staffs));
+            logger.info("Monitoring log saved successfully");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }catch (DataPersistFailedException e){
             e.printStackTrace();
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -65,14 +72,18 @@ public class MonitoringLogController {
         try{
             String observedPic = observedImage != null ? AppUtil.toBase64(observedImage) : null;
             monitoringLogService.saveMLog(new MonitoringLogDTO(logCode,logDate,observation,observedPic,fields,crops,staffs));
+            logger.info("Monitoring log updated successfully");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (LogNotFoundException e){
             e.printStackTrace();
+            logger.error("Monitoring log not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (DataPersistFailedException e){
             e.printStackTrace();
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -81,12 +92,16 @@ public class MonitoringLogController {
     public ResponseEntity<Void> deleteMLog(@PathVariable("id") String id){
         try{
             monitoringLogService.deleteMLog(id);
+            logger.info("Monitoring log deleted successfully");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (IllegalStateException e){
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (LogNotFoundException e){
+            logger.error("Monitoring log not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -95,10 +110,13 @@ public class MonitoringLogController {
     public MonitorLogResponse getSelectedMLog(@PathVariable("id") String id){
         try{
             MonitorLogResponse monitorLogResponse = monitoringLogService.getSelectedMLog(id);
+            logger.info("Monitoring log selected successfully");
             return ResponseEntity.status(HttpStatus.OK).body(monitorLogResponse).getBody();
         }catch (LogNotFoundException e){
+            logger.error("Monitoring log not found");
             return (MonitorLogResponse) ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return (MonitorLogResponse) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -107,10 +125,13 @@ public class MonitoringLogController {
     public ResponseEntity<List<MonitoringLogDTO>> getAllLogs(){
         try{
             List<MonitoringLogDTO> logs = monitoringLogService.getAllMLogs();
+            logger.info("Monitoring logs retrieved successfully");
             return ResponseEntity.status(HttpStatus.OK).body(logs);
         }catch (LogNotFoundException e){
+            logger.error("Monitoring log not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }

@@ -15,7 +15,7 @@ public class HealthTestController {
 
     @GetMapping
     public String testHealth(){
-        logger.info("Received request to test health");
+        logger.info("Health Test Success , Green Shadow App Run Successfully");
         return "Health Test Success , Green Shadow App Run Successfully";
     }
 }

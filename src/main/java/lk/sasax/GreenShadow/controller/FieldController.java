@@ -14,6 +14,8 @@ import lk.sasax.GreenShadow.service.FieldService;
 import lk.sasax.GreenShadow.util.AppUtil;
 import lk.sasax.GreenShadow.util.Enum.AvailabilityStatus;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,6 +33,8 @@ public class FieldController {
     @Autowired
     private final FieldService fieldService;
 
+    private static final Logger logger = LoggerFactory.getLogger(FieldController.class);
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> saveField(
             //@RequestPart("fCode") String fCode,
@@ -40,12 +44,11 @@ public class FieldController {
             @RequestPart(value = "fieldImage1",required = false) MultipartFile fieldImage1,
             @RequestPart(value = "fieldImage2",required = false) MultipartFile fieldImage2,
             @RequestParam("status") AvailabilityStatus status,
-            @RequestPart(value = "crops",required = false) List<Crop> crops,
-            @RequestPart(value = "staffs",required = false) List<Staff> staffs,
-            @RequestPart(value = "equipments",required = false) List<Equipment> equipments,
-            @RequestPart(value = "monitoringLogs",required = false) List<MonitoringLog> monitoringLogs
+            @RequestParam(value = "crops",required = false) List<Crop> crops,
+            @RequestParam(value = "staffs",required = false) List<Staff> staffs,
+            @RequestParam(value = "equipments",required = false) List<Equipment> equipments,
+            @RequestParam(value = "monitoringLogs",required = false) List<MonitoringLog> monitoringLogs
     ){
-        System.out.println("Save Field");
         try{
             String fieldPic = fieldImage1 !=null ? AppUtil.toBase64(fieldImage1) : null;
             String fieldPic1 = fieldImage2 != null ? AppUtil.toBase64(fieldImage2) : null;
@@ -64,12 +67,15 @@ public class FieldController {
             buildFieldDTO.setEquipments(equipments);
             buildFieldDTO.setMonitoringLogs(monitoringLogs);
             fieldService.saveField(buildFieldDTO);
+            logger.info("Save Field successful");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }catch (DataPersistFailedException e){
             e.printStackTrace();
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (Exception e){
             e.printStackTrace();
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -109,12 +115,15 @@ public class FieldController {
             buildFieldDTO.setEquipments(equipments);
             buildFieldDTO.setMonitoringLogs(monitoringLogs);
             fieldService.saveField(buildFieldDTO);
+            logger.info("Update Field successful");
             return ResponseEntity.status(HttpStatus.CREATED).build();
         } catch (DataPersistFailedException e) {
             e.printStackTrace();
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -123,12 +132,16 @@ public class FieldController {
     public ResponseEntity<Void> deleteField(@PathVariable("id") String id){
         try{
             fieldService.deleteField(id);
+            logger.info("Delete Field successful");
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }catch (IllegalStateException e){
+            logger.error("Request failed with status: BAD_REQUEST due to invalid input or processing error");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }catch (FieldNotFoundException e){
+            logger.error("Field Not Found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -137,10 +150,13 @@ public class FieldController {
     public FieldResponse getSelectedField(@PathVariable("id") String id){
         try {
             FieldResponse fieldResponse = fieldService.getSelectedField(id);
+            logger.info("Get Field successful");
             return ResponseEntity.status(HttpStatus.OK).body(fieldResponse).getBody();
         }catch (FieldNotFoundException e){
+            logger.error("Field Not Found");
             return (FieldResponse) ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return (FieldResponse) ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
@@ -149,10 +165,13 @@ public class FieldController {
     public ResponseEntity<List<FieldDTO>> getAllFields(){
         try{
             List<FieldDTO> fields = fieldService.getAllFields();
+            logger.info("Get Fields successful");
             return ResponseEntity.status(HttpStatus.OK).body(fields);
         }catch (FieldNotFoundException e){
+            logger.error("Field Not Found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }catch (Exception e){
+            logger.error("Request failed with status: INTERNAL_SERVER_ERROR due to internal server error");
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
