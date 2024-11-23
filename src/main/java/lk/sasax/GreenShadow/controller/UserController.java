@@ -36,10 +36,15 @@ public class UserController {
         return ResponseEntity.ok(authenticationService.signUp(signUpRequest));
     }
 
-    @PostMapping("/check_credentials")
+    @PostMapping("/refresh")
+    public ResponseEntity<ReqResp> refreshToken(@RequestBody ReqResp refreshTokenRequest){
+        return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
+    }
+
+    /*@PostMapping("/check_credentials")
     public Boolean checkCredentials(@RequestBody UserDTO userDTO){
         System.out.println(userDTO.getEmail() + " " + userDTO.getPassword() + " " + userDTO.getRole());
         logger.info("Received request to check credentials for user: {}", userDTO.getEmail());
         return authenticationService.checkCredentials(userDTO);
-    }
+    }*/
 }

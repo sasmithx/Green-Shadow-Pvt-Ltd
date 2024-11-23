@@ -5,8 +5,6 @@ import lk.sasax.GreenShadow.entity.impl.User;
 import lk.sasax.GreenShadow.repository.UserRepository;
 import lk.sasax.GreenShadow.service.AuthenticationService;
 import lk.sasax.GreenShadow.util.Enum.AccessRole;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -72,6 +70,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return response;
     }
 
-
+    public ReqResp refreshToken(ReqResp refreshTokenReqiest){
+        ReqResp response = new ReqResp();
+        String ourEmail = jwtUtil.extractUsername(refreshTokenReqiest.getToken());
+        User users = userRepository.findByEmail(ourEmail).orElseThrow();
+        if (jwtUtil.isTokenValid(refreshTokenReqiest.getToken(), users)) {
+            var jwt = jwtUtil.generateToken(users);
+            response.setStatusCode(200);
+            response.setToken(jwt);
+            response.setRefreshToken(refreshTokenReqiest.getToken());
+            response.setExpirationTime("24Hr");
+            response.setMessage("Successfully Refreshed Token");
+        }
+        response.setStatusCode(500);
+        return response;
+    }
 
 }
