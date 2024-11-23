@@ -1,3 +1,4 @@
+/*
 package lk.sasax.GreenShadow.config;
 
 import jakarta.servlet.FilterChain;
@@ -98,3 +99,4 @@ public class JWTConfigurationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+*/

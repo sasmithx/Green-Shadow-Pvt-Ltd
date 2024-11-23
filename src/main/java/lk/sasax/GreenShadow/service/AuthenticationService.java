@@ -12,10 +12,5 @@ import java.util.List;
 
 @Service
 public interface AuthenticationService {
-    JWTAuthResponse signIn(SignInRequest sIgnInRequest);
-    JWTAuthResponse signUp(SignUpRequest signUpRequest);
 
-   // List<String> sendWishes();
-
-    Boolean checkCredentials(UserDTO userDTO);
 }

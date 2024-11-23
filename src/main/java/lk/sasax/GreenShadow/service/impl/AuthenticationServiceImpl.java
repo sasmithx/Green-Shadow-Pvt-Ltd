@@ -1,142 +1,77 @@
 package lk.sasax.GreenShadow.service.impl;
 
-import lk.sasax.GreenShadow.auth.request.SignInRequest;
-import lk.sasax.GreenShadow.auth.request.SignUpRequest;
-import lk.sasax.GreenShadow.auth.response.JWTAuthResponse;
-import lk.sasax.GreenShadow.dto.impl.UserDTO;
-import lk.sasax.GreenShadow.entity.impl.Staff;
+import lk.sasax.GreenShadow.dto.impl.ReqResp;
 import lk.sasax.GreenShadow.entity.impl.User;
-import lk.sasax.GreenShadow.exception.DuplicateRecordException;
-import lk.sasax.GreenShadow.exception.InvalidAccessRoleException;
-import lk.sasax.GreenShadow.exception.NotFoundException;
-import lk.sasax.GreenShadow.repository.StaffRepository;
 import lk.sasax.GreenShadow.repository.UserRepository;
 import lk.sasax.GreenShadow.service.AuthenticationService;
-import lk.sasax.GreenShadow.service.JWTService;
 import lk.sasax.GreenShadow.util.Enum.AccessRole;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.mail.MessagingException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
+import java.util.HashMap;
+
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
 public class AuthenticationServiceImpl implements AuthenticationService {
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserRepository userRepo;
-    private final ModelMapper mapper;
-    private final JWTService jwtService;
-    private final AuthenticationManager authenticationManager;
-    //private final CustomerRepo customerRepo;
-    private final Path stateFilePath = Paths.get("task_state.txt");
-    //private final EmployeeRepo employeeRepo;
-    private final StaffRepository staffRepo;
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    JWTUtil jwtUtil;
+    @Autowired
+    PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
-    @Override
-    public JWTAuthResponse signIn(SignInRequest signInRequest) {
-        log.info("signing in new user: {}", signInRequest.getEmail());
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signInRequest.getEmail(), signInRequest.getPassword()));
-        User user = userRepo.findByEmail(signInRequest.getEmail()).orElseThrow(()->new UsernameNotFoundException("User Not Found"));
-        String generatedToken = jwtService.generateToken(user);
-        String role = user.getRole().name();
-
-        return JWTAuthResponse.builder().token(generatedToken).role(role).build();
-    }
-
-    @Override
-    public JWTAuthResponse signUp(SignUpRequest signUpRequest) {
-        System.out.println(signUpRequest);
-        log.info("trying to create a new user account: {}", signUpRequest.getEmail());
-
-        User savedUser;
-        if(userRepo.existsById(signUpRequest.getEmail())){
-            throw new DuplicateRecordException("User with email " + signUpRequest.getEmail() + " already exists");
-        }else{
-            Optional<Staff> staff = staffRepo.findByEmail(signUpRequest.getEmail());
-
-            if (staff.isEmpty()){
-                throw new NotFoundException("Staff with email " + signUpRequest.getEmail() + " not found.");
-            }else{
-                UserDTO userDTO = UserDTO.builder()
-                        .email(signUpRequest.getEmail())
-                        .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                        .role(AccessRole.valueOf(staff.get().getRole()))
-                        .build();
-                savedUser = userRepo.save(mapper.map(userDTO, User.class));
-            }
-        }
-        String generatedToken = jwtService.generateToken(savedUser);
-        return JWTAuthResponse.builder().token(generatedToken).build();
-    }
-
-    @Override
-    public Boolean checkCredentials(UserDTO userDTO) {
-        Optional<User> user = userRepo.findByEmail(userDTO.getEmail());
-        System.out.println(user);
-
-        if(user.isEmpty()){
-            throw new NotFoundException("MANAGER email not found.");
-        }else{
-            System.out.println(user.get().getRole());
-
-            if(user.get().getRole() == AccessRole.MANAGER){
-                if(passwordEncoder.matches(userDTO.getPassword(), user.get().getPassword())){
-                    return true;
-                }else{
-                    return false;
-                }
-            }else{
-                throw new InvalidAccessRoleException("You don't have permission for this action.\nOnly managers are allowed.");
-            }
-        }
-    }
-
-    private boolean isTaskExecutedToday() {
+    public ReqResp signUp(ReqResp registrationRequest){
+        ReqResp resp = new ReqResp();
         try {
-            if (Files.exists(stateFilePath)) {
-                System.out.println("exists");
-                String lastExecutionDateStr = Files.readString(stateFilePath).trim();
-                if(lastExecutionDateStr.isEmpty() || !lastExecutionDateStr.matches("-?\\d+")) {
-                    return false;
-                }
-                Date lastExecutionDate = new Date(Long.parseLong(lastExecutionDateStr));
-                Calendar currentCal = Calendar.getInstance();
-                Calendar lastExecutionCal = Calendar.getInstance();
-                lastExecutionCal.setTime(lastExecutionDate);
-                return currentCal.get(Calendar.YEAR) == lastExecutionCal.get(Calendar.YEAR) &&
-                        currentCal.get(Calendar.DAY_OF_YEAR) == lastExecutionCal.get(Calendar.DAY_OF_YEAR);
-            }else {
-                System.out.println("doesn't exist");
-                Files.createFile(stateFilePath);
-                Calendar yesterdayCal = Calendar.getInstance();
-                yesterdayCal.add(Calendar.DAY_OF_MONTH, -1);
-                Date yesterdayDate = yesterdayCal.getTime();
-                saveLastExecutionDate(yesterdayDate);
+            User user = new User();
+            user.setEmail(registrationRequest.getEmail());
+            user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
+            user.setRole(AccessRole.valueOf(registrationRequest.getRole()));
+            User UserResult = userRepository.save( user);
+            if (UserResult != null &&
+                    UserResult.getEmail() != null && !UserResult.getEmail().isEmpty() &&
+                    UserResult.getUsername() != null && !UserResult.getUsername().isEmpty() &&
+                    UserResult.getPassword() != null && !UserResult.getPassword().isEmpty()) {
+                resp.setOurUsers(UserResult);
+                resp.setMessage("User Saved Successfully");
+                resp.setStatusCode(200);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        }catch (Exception e){
+            resp.setStatusCode(500);
+            resp.setError(e.getMessage());
         }
-        return false;
+        return resp;
     }
 
-    private void saveLastExecutionDate(Date executionDate) {
+    public ReqResp signIn(ReqResp signinRequest){
+        ReqResp response = new ReqResp();
+
         try {
-            Files.writeString(stateFilePath, String.valueOf(executionDate.getTime()));
-        } catch (IOException e) {
-            e.printStackTrace();
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
+            var user = userRepository.findByEmail(signinRequest.getEmail()).orElseThrow();
+            System.out.println("USER IS: "+ user);
+            var jwt = jwtUtil.generateToken(user);
+            var refreshToken = jwtUtil.generateRefreshToken(new HashMap<>(), user);
+            response.setStatusCode(200);
+            response.setToken(jwt);
+            response.setRefreshToken(refreshToken);
+            response.setExpirationTime("24Hr");
+            response.setMessage("Successfully Signed In");
+        }catch (Exception e){
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
         }
+        return response;
     }
+
+
+
 }

@@ -2,11 +2,14 @@ package lk.sasax.GreenShadow.config;
 
 import lk.sasax.GreenShadow.service.impl.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,29 +22,86 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-    private final UserServiceImpl userService;
-    private final JWTConfigurationFilter jwtConfigurationFilter;
+
+    @Autowired
+    private UserServiceImpl userService;
+    @Autowired
+    private JWTFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable) // disable CSRF protection
-                .authorizeHttpRequests((authorize) -> authorize.requestMatchers("api/v1/auth/**").permitAll() // authorize requests to "/api/v1/auth/**" without authentication
-                        .anyRequest().authenticated()) // authorize any other request with authentication
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // if there is no need to create sessions, you can use SessionCreationPolicy.STATELESS
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(request -> request
+                        // Public endpoints - everyone can access authentication and public endpoints
+                        .requestMatchers("/api/v1/auth/**", "/public/**").permitAll()
+
+                        // Full access for only MANAGER to CRUD all resources (including crops)
+                        .requestMatchers( "/api/v1/manage/**","/api/v1/log/**").hasAnyAuthority("MANAGER")
+                        .requestMatchers("/api/v1/email/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER" ,"SCIENTIST")
+//                        .requestMatchers("/api/v2/staff/**",  "/api/v2/field/**").hasAnyAuthority("MANAGER", "ADMINISTRATIVE")
+
+                        // ADMINISTRATIVE users can only GET /api/v2/crop/** (view crop data)
+                        .requestMatchers(HttpMethod.GET, "/api/v1/crop/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER","SCIENTIST")
+
+                        // Restrict SCIENTIST AND MANAGER users from performing POST, PUT, DELETE on /api/v2/crop/** (they can only view with GET)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/crop/**").hasAnyAuthority("MANAGER","SCIENTIST")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/crop/**").hasAnyAuthority("MANAGER","SCIENTIST")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/crop/**").hasAnyAuthority("MANAGER","SCIENTIST")
+                        // ADMINISTRATIVE users can only GET /api/v2/crop/** (view crop data)
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/field/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER","SCIENTIST")
+                        // Restrict SCIENTIST AND MANGER users from performing POST, PUT, DELETE on /api/v2/crop/** (they can only view with GET)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/field/**").hasAnyAuthority("MANAGER","SCIENTIST")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/field/**").hasAnyAuthority("MANAGER","SCIENTIST")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/field/**").hasAnyAuthority("MANAGER","SCIENTIST")
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/vehicle/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER","SCIENTIST")
+                        // Restrict ADMINISTRATIVE AND MANAGER  from performing POST, PUT, DELETE on /api/v2/crop/** (they can only view with GET)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/vehicle/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/vehicle/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/vehicle/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/staff/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER","SCIENTIST")
+                        // Restrict ADMINISTRATIVE AND MANAGER  from performing POST, PUT, DELETE on /api/v2/crop/** (they can only view with GET)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/staff/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/staff/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/staff/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+
+
+                        .requestMatchers(HttpMethod.GET, "/api/v1/equipment/**").hasAnyAuthority("ADMINISTRATIVE","MANAGER","SCIENTIST")
+                        // Restrict ADMINISTRATIVE AND MANAGER  from performing POST, PUT, DELETE on /api/v2/crop/** (they can only view with GET)
+                        .requestMatchers(HttpMethod.POST, "/api/v1/equipment/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/equipment/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/equipment/**").hasAnyAuthority("MANAGER","ADMINISTRATIVE")
+
+
+
+
+
+                        // Any other request must be authenticated (no public access allowed)
+                        .anyRequest().authenticated())
+
+                // Stateless session management (no HTTP sessions)
+                .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+                // Add authentication provider and JWT filter
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtConfigurationFilter, UsernamePasswordAuthenticationFilter.class);
-        return http.build();
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return httpSecurity.build();
     }
+
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
-        authenticationProvider.setUserDetailsService(userService.userDetailsService());
-        authenticationProvider.setPasswordEncoder(passwordEncoder());
-        return authenticationProvider;
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
+        daoAuthenticationProvider.setUserDetailsService(userService);
+        daoAuthenticationProvider.setPasswordEncoder(passwordEncoder());
+        return daoAuthenticationProvider;
     }
 
     @Bean
@@ -50,7 +110,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
     }
+
 }
